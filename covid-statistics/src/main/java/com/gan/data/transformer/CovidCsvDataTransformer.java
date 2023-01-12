@@ -3,7 +3,7 @@ package com.gan.data.transformer;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class CovidCsvDataTransformer {
 	
 	public CovidCsvDataTransformer(){
 		List<String> lines = readFromFile("data/countries_to_continent.csv");
-		continentMap = lines.stream().skip(1).map(s -> s.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")).collect(Collectors.toMap(con-> con[1], con-> con[0]));
+		continentMap = lines.stream().skip(1).map(s -> s.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")).collect(Collectors.toMap(con-> con[1].trim(), con-> con[0].trim()));
 	}
 
 	
@@ -38,11 +38,9 @@ public class CovidCsvDataTransformer {
 		lines.stream().skip(1).map(s -> s.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)")).forEach(array -> {
 			int dateIndex = 4;
 			String state = array[0];
-			String country = array[1];
+			String country = array[1].trim();
 			String continent = continentMap.get(country);
-			if(continent == null) {
-				System.out.println("there is no continent mapping present for "+ country);
-			}
+			
 
 			while (dateIndex < dates.size()) {
 				String date = dates.get(dateIndex);
@@ -63,7 +61,7 @@ public class CovidCsvDataTransformer {
 		List<String> lines;
 		try {
 			lines = Files
-					.readAllLines(Path.of(Thread.currentThread().getContextClassLoader().getResource(fileLocation).toURI()));
+					.readAllLines(Paths.get(Thread.currentThread().getContextClassLoader().getResource(fileLocation).toURI()));
 		} catch (IOException | URISyntaxException e) {
 			throw new RuntimeException("Error while paring file "+ fileLocation , e);
 		}
